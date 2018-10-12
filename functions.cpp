@@ -27,7 +27,7 @@ void MedianFilter(Mat &anImage, Mat &res, int size); //size must be an odd numbe
 //=================
 void Analysis(string name, Mat& anImg, bool save)
 {
-	//show original image
+    //show original image
     namedWindow("Image" + name, WINDOW_NORMAL);
     resizeWindow("Image" + name, WIDTH, HEIGHT);
     imshow("Image" + name, anImg);
