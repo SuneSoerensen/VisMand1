@@ -21,6 +21,10 @@ void CalcAndShowHist(string name, Mat &anImage, bool save);
 void dftshift(cv::Mat& mag); //taken from "03_freq_domain_template.cpp" from BlackBoard!!!
 void CalcAndShowFourierMag(string name, Mat &anImage, bool save);
 void MedianFilter(Mat &anImage, Mat &res, int size); //size must be an odd number
+void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
+void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
+void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
+
 
 //=================
 //   Definitions
@@ -45,14 +49,14 @@ void CalcAndShowHist(string name, Mat &anImage, bool save)
 {
     //calculate histogram
     Mat hist;
-    
+
     float range[] = {0, 256};
 	const float* ranges = {range};
 	int bins = 256;
-    
+
     //(images, nimages, channels, mask, hist, dims, histSize, ranges, uniform, accumulate)
     calcHist(&anImage, 1, 0, Mat(), hist, 1, &bins, &ranges, true, false);
-    
+
     //find the largest bin value
 	int largestBinVal = 0;
 	for (int i = 0; i < hist.rows; i++)
@@ -63,7 +67,7 @@ void CalcAndShowHist(string name, Mat &anImage, bool save)
 
     //create histogram image
     Mat histImg(HEIGHT, WIDTH, CV_8UC1, 255);
-    
+
 	for (int x = 0; x < histImg.cols; x++)
 	{
 		int bin = ((double)(hist.rows - 1) / (double)(histImg.cols - 1)) * x; // (bin / pix) * pix = bin
@@ -75,7 +79,7 @@ void CalcAndShowHist(string name, Mat &anImage, bool save)
 				histImg.at<uchar>(histImg.rows - 1 - y, x) = 0; //draw from the bottom
 		}
 	}
-    
+
     imshow(name, histImg);
     if (save)
 	imwrite(name + ".png", histImg);
@@ -107,35 +111,35 @@ void CalcAndShowFourierMag(string name, Mat &anImage, bool save)
     //calc optimal size
     int height = getOptimalDFTSize((2 * anImage.rows) - 1);
     int width = getOptimalDFTSize((2 * anImage.cols) - 1);
-    
+
     //pad image equally on all edges to make it optimally sized
     Mat imgWithPad;
     copyMakeBorder(anImage, imgWithPad, (height - anImage.rows) / 2, (height - anImage.rows) / 2, (width - anImage.cols) / 2, (width - anImage.cols) / 2, BORDER_CONSTANT, 0);
-    
+
     //merge
     Mat img2Channel;
     Mat temp[2] = {Mat_<float>(imgWithPad), (Mat_<float>(imgWithPad)) = 0};
     merge(temp, 2, img2Channel);
-    
+
     //dft
     dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
-    
+
     //split
     split(img2Channel, temp);
     Mat mag;
     magnitude(temp[0], temp[1], mag);
-    
+
     //prepare for visualization
     dftshift(mag);
     mag += 1;
     log(mag, mag);
     normalize(mag, mag, 0, 1, NORM_MINMAX);
-    
+
     //visualize
     namedWindow(name, WINDOW_NORMAL);
     resizeWindow(name, WIDTH, HEIGHT);
     imshow(name, mag);
-    
+
     if (save)
     {
 	//gamma transformation (for visualization)
@@ -147,12 +151,12 @@ void CalcAndShowFourierMag(string name, Mat &anImage, bool save)
 		mag.at<uchar>(i, j) = pow(mag.at<uchar>(i, j) / 255.0, 1.0) * 255.0;
 	    }
 	}
-	
+
 	imwrite(name + ".png", mag);
     }
 }
 
-void MedianFilter(Mat &anImage, Mat &res, int size)
+void MedianFilter(Mat &anImage, Mat &res, int size, int numberFromList)
 {
     anImage.copyTo(res);
     for (int i = 0; i < anImage.rows; i++)
@@ -171,10 +175,106 @@ void MedianFilter(Mat &anImage, Mat &res, int size)
                         arr.push_back(0); //padding value
                 }
             }
-            
+
             std::sort(arr.begin(), arr.end());
-            
+
             res.at<uchar>(i, j) = arr[18];
+        }
+    }
+}
+
+void MaxFilter(Mat &anImage, Mat &res, int size)
+{
+    anImage.copyTo(res);
+    for (int i = 0; i < anImage.rows; i++)
+    {
+        for (int j = 0; j < anImage.cols; j++)
+        {
+            //find all neighbours
+            vector<int> arr;
+            for (int k = -size/2; k <= size/2; k++)
+            {
+                for (int l = -size/2; l < size/2; l++)
+                {
+                    if (i + k > 0 && i + k < anImage.rows && j + l > 0 && j + l < anImage.cols) //if not out of bounds
+                        arr.push_back(anImage.at<uchar>(i + k, j + l));
+                    else
+                        arr.push_back(0); //padding value
+                }
+            }
+
+            std::sort(arr.begin(), arr.end());
+
+            res.at<uchar>(i, j) = arr[arr.size()-1]; // take max value to remove pepper
+        }
+    }
+}
+
+void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize)
+{
+    anImage.copyTo(res);
+    for (int i = 0; i < anImage.rows; i++)
+    {
+        for (int j = 0; j < anImage.cols; j++)
+        {
+          for (int m = 3; m < maxsize; m++)
+          {
+            //find all neighbours
+            vector<int> arr;
+            for (int k = -m/2; k <= m/2; k++)
+            {
+              for (int l = -m/2; l < m/2; l++)
+              {
+                  if (i + k > 0 && i + k < anImage.rows && j + l > 0 && j + l < anImage.cols) //if not out of bounds
+                      arr.push_back(anImage.at<uchar>(i + k, j + l));
+                  else
+                      arr.push_back(0); //padding value
+              }
+            }
+
+            std::sort(arr.begin(), arr.end());
+
+            if (arr[arr.size()-1]> 0 || m == maxsize)
+            {
+              res.at<uchar>(i, j) = arr[arr.size()-1]; // take max value to remove pepper
+              break;
+            }
+          }
+        }
+    }
+}
+
+
+void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize)
+{
+    anImage.copyTo(res);
+    for (int i = 0; i < anImage.rows; i++)
+    {
+        for (int j = 0; j < anImage.cols; j++)
+        {
+          for (int m = 3; m < maxsize; m++)
+          {
+            //find all neighbours
+            vector<int> arr;
+            for (int k = -m/2; k <= m/2; k++)
+            {
+              for (int l = -m/2; l < m/2; l++)
+              {
+                  if (i + k > 0 && i + k < anImage.rows && j + l > 0 && j + l < anImage.cols) //if not out of bounds
+                      arr.push_back(anImage.at<uchar>(i + k, j + l));
+                  else
+                      arr.push_back(0); //padding value
+              }
+            }
+
+            std::sort(arr.begin(), arr.end());
+
+            if (arr[(int)(arr.size()/1.2)]> 0 && arr[(int)(arr.size()/1.2)]<255 || m == maxsize) // preset to pick about 80%
+            {
+              res.at<uchar>(i, j) = arr[(int)arr.size()/1.2];  // preset to pick about 80%
+              break;
+            }
+          }
         }
     }
 }
