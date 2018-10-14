@@ -1,20 +1,24 @@
 #include "functions.cpp"
+#include <iostream>
+
+using namespace std;
 
 int main()
 {
-    Mat img1 = imread("../Images/Image1.png", IMREAD_GRAYSCALE);
-    
-    Analysis("1", img1, false);
-    
-    /*Mat filtered;
-    MedianFilter(img1, filtered, 5);
+    Mat img1 = imread("Image1.png", IMREAD_GRAYSCALE);
+
+    //Analysis("1", img1, false);
+
+    Mat filtered;
     Mat filtered2;
-    MedianFilter(filtered, filtered2, 5);
-    namedWindow("Filtered image", WINDOW_NORMAL);
-    resizeWindow("Filtered image", WIDTH, HEIGHT);
-    imshow("Filtered image", filtered2);*/
-    
-    
+    adaptiveMaxFilter(img1, filtered, 9);
+    namedWindow("adaptiveMax", WINDOW_NORMAL);
+    resizeWindow("adaptiveMax", WIDTH, HEIGHT);
+    imshow("adaptiveMax",filtered);
+    Analysis("1",filtered,false);
+
+
+
     waitKey(0);
     return 0;
 }
