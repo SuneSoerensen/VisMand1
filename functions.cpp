@@ -25,6 +25,7 @@ void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
 void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
 void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
+void gaussianBandReject(Mat& inputImg, Mat& outputImg, int bandWidth, int cutoff);
 
 
 //=================
@@ -343,6 +344,36 @@ void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize)
               break;
             }
           }
+        }
+    }
+}
+
+void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff)
+{
+    //Define parts of the filter, for readability:
+    double numerator = 0;
+    double denominator = 0;
+    double dist = 0;
+    int rows = output.rows;
+    int cols = output.cols;
+
+    /*DEBUG*/
+    cout << "Rows: " << rows << ", Cols: " << cols << endl;
+
+    //For every element:
+    for(int u = 0; u < cols; u++)
+    {
+        for(int v = 0; v < rows; v++)
+        {
+            //Real part:
+            dist = sqrt(pow((double)u - (double)(cols / 2.0), 2) + pow((double)v - ((double)rows / 2.0), 2)); //Distance from center of filter
+            numerator = pow(dist , 2) - pow((double)cutoff, 2);
+            denominator = dist * (double)bandWidth;
+            output(v, u)[0] = 1.0 - exp(-pow(numerator/denominator, 2));
+            ///*DEBUG*/ cout << "Val: " << 1.0 - exp(-pow(numerator/denominator, 2)) << endl;
+
+            //Imaginary part:
+            output(v, u)[1] = 0;
         }
     }
 }
