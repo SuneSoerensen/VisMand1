@@ -23,6 +23,7 @@ void CalcAndShowFourierMag(string name, Mat &anImage, bool save);
 void MedianFilter(Mat &anImage, Mat &res, int size); //size must be an odd number
 void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
 void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
+void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
 
 
@@ -35,6 +36,8 @@ void Analysis(string name, Mat& anImg, bool save)
     namedWindow("Image" + name, WINDOW_NORMAL);
     resizeWindow("Image" + name, WIDTH, HEIGHT);
     imshow("Image" + name, anImg);
+    if (save)
+	imwrite("Image" + name + ".png", anImg);
 
     CalcAndShowHist("Original" + name, anImg, save);
 
@@ -244,6 +247,71 @@ void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize)
     }
 }
 
+void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize)
+{
+    anImage.copyTo(res);
+    for (int i = 0; i < anImage.rows; i++)
+    {
+        for (int j = 0; j < anImage.cols; j++) //for all pixels in the image
+        {
+            int size = 3;
+            while (true)
+            {
+                //find all neighbours
+                vector<int> arr;
+                for (int k = -size/2; k <= size/2; k++)
+                {
+                    for (int l = -size/2; l < size/2; l++)
+                    {
+                        if (i + k > 0 && i + k < anImage.rows && j + l > 0 && j + l < anImage.cols) //if not out of bounds
+                            arr.push_back(anImage.at<uchar>(i + k, j + l));
+                        else
+                            arr.push_back(0); //padding value
+                    }
+                }
+
+		//sort
+                std::sort(arr.begin(), arr.end());
+
+		//the actual work
+                int z_min = arr[0];
+		int z_max = arr[arr.end() - arr.begin()];
+		int z_med = arr[(arr.end() - arr.begin()) / 2];
+		int z_xy = anImage.at<uchar>(i, j);
+
+		//stage A
+		if ((z_med - z_min) > 0 && (z_med - z_max) < 0) //if A1 > 0 AND A2 < 0
+		{
+		    //stage B
+		    if ((z_xy - z_min) > 0 && (z_xy - z_max) < 0)  //if B1 > 0 AND B2 < 0
+		    {
+			res.at<uchar>(i, j) = z_xy; //output z_xy
+			break;
+		    }
+		    else
+		    {
+			res.at<uchar>(i, j) = z_med; //output z_med
+			break;
+		    }
+		}
+		else
+		{
+		    size++; //increase the window size
+		}
+
+		if (size <= maxSize)
+		{
+		    //repeat stage A
+		}
+		else
+		{
+		    anImage.at<uchar>(i, j) = z_med; //output z_med
+		    break;
+		}
+            }
+        }
+    }
+}
 
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize)
 {
