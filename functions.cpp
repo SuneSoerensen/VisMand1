@@ -399,7 +399,7 @@ void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
     dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
 
     //shift the filter quadrants
-    dftshift(filter);
+    dftshift(aFilter);
 
     //multiply in frequency domain to apply filter
     Mat resFreq;
@@ -411,7 +411,7 @@ void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
     dft(resFreq, res, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
 
     //crop to remove padding
-    res = Mat(res, Rect(Point(0, 0), img.size()));
+    res = Mat(res, Rect(Point(0, 0), anImage.size()));
 
     //save
     res.copyTo(anImage);
