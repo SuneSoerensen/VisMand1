@@ -25,8 +25,9 @@ void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
 void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
 void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
-void gaussianBandReject(Mat& inputImg, Mat& outputImg, int bandWidth, int cutoff);
+void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff);
 void ApplyFreqFilter(Mat &anImage, Mat &aFilter); //apply complex filter in the frequency domain
+void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
 
 
 //=================
@@ -413,4 +414,50 @@ void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
 
     //save
     res.copyTo(anImage);
+}
+
+void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight)
+{
+    //Defined for convenience:
+    double numerator = filterWidth * filterHeight;
+    double denominator = 0;
+
+    //Make sure that filtersize is odd:
+    if(filterWidth % 2 == 0)
+    {
+        filterWidth--;
+        cout << "Filter width reduced by 1, to make it odd!" << endl;
+    }
+
+    if(filterHeight % 2 == 0)
+    {
+        filterHeight--;
+        cout << "Filter height reduced by 1, to make it odd!" << endl;
+    }
+
+    //Compute filtered image:
+    //For all pixels in the image:
+    for(int i = 0; i < inputImg.cols; i++)
+    {
+        for(int j = 0; j < inputImg.rows; j++)
+        {
+            //Run through filter-window (calc. denominator):
+            for(int k = i - (filterWidth / 2); k <= i + (filterWidth / 2); k++)
+            {
+                /*DEBUG*/ cout << "k: " << k << endl;
+                for(int l = j - (filterHeight / 2); l <= j + (filterHeight / 2); l++)
+                {
+                    //If inside the image:
+                    if(k > 0 && k < inputImg.cols && l > 0 && l < inputImg.rows)
+                        denominator += 1.0/(double)inputImg.at<uchar>(k, l);
+                    //...Otherwise, do nothing = use black padding
+                }
+            }
+            //Finally, calculate the new pixel and set it in the output image:
+            outputImg.at<uchar>(j, i) = numerator / denominator;
+
+            //Reset denominator for next time:
+            denominator = 0;
+        }
+    }
 }
