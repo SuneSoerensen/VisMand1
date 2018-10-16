@@ -403,8 +403,7 @@ void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
     dftshift(aFilter);
 
     //multiply in frequency domain to apply filter
-    Mat resFreq;
-    img2Channel.copyTo(resFreq);
+    Mat resFreq = img2Channel.clone();
     mulSpectrums(img2Channel, aFilter, resFreq, 0, false);
 
     //inverse Fourier transform
