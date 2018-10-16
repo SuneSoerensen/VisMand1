@@ -26,6 +26,7 @@ void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
 void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
 void gaussianBandReject(Mat& inputImg, Mat& outputImg, int bandWidth, int cutoff);
+void ApplyFreqFilter(Mat &anImage, Mat &aFilter); //apply complex filter in the frequency domain
 
 
 //=================
@@ -376,4 +377,41 @@ void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff)
             output(v, u)[1] = 0;
         }
     }
+}
+
+void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
+{
+    //calc optimal size
+    int height = getOptimalDFTSize((2 * anImage.rows) - 1);
+    int width = getOptimalDFTSize((2 * anImage.cols) - 1);
+
+    //pad image to make it optimally sized
+    Mat imgWithPad;
+    copyMakeBorder(anImage, imgWithPad, 0, height - anImage.rows, 0, width - anImage.cols, BORDER_CONSTANT, 0);
+
+    //merge
+    Mat img2Channel;
+    Mat temp[2] = {Mat_<float>(imgWithPad), (Mat_<float>(imgWithPad)) = 0};
+    merge(temp, 2, img2Channel);
+
+    //dft
+    dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
+
+    //shift the filter quadrants
+    dftshift(filter);
+
+    //multiply in frequency domain to apply filter
+    Mat resFreq;
+    img2Channel.copyTo(resFreq);
+    mulSpectrums(img2Channel, aFilter, resFreq, 0, false);
+
+    //inverse Fourier transform
+    Mat res;
+    dft(resFreq, res, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+
+    //crop to remove padding
+    res = Mat(res, Rect(Point(0, 0), img.size()));
+
+    //save
+    res.copyTo(anImage);
 }
