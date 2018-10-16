@@ -25,7 +25,7 @@ void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
 void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
 void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
-void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff)
+void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff);
 void ApplyFreqFilter(Mat &anImage, Mat &aFilter); //apply complex filter in the frequency domain
 void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
 
@@ -445,6 +445,7 @@ void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filt
             //Run through filter-window (calc. denominator):
             for(int k = i - (filterWidth / 2); k <= i + (filterWidth / 2); k++)
             {
+                /*DEBUG*/ cout << "k: " << k << endl;
                 for(int l = j - (filterHeight / 2); l <= j + (filterHeight / 2); l++)
                 {
                     //If inside the image:

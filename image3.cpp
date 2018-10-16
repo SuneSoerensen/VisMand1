@@ -6,8 +6,14 @@ int main()
     
     //Analysis("3", img3, false); //Not needed, for now at least
 
-    Mat filtered;
-    harmonicMeanFilter(img3, filtered, 3, 3);
+    //Apply filter:
+    Mat filtered(img3.size(), CV_8U);
+    harmonicMeanFilter(img3, filtered, 7, 7);
+
+    //Show result:
+    namedWindow("Filtered image", WINDOW_NORMAL);
+    imshow("Filtered image", filtered);
+    resizeWindow("Filtered image", Size(WIDTH, HEIGHT));
     
     waitKey(0);
     return 0;
