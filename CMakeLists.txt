@@ -5,8 +5,8 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 #image1
-add_executable(image1 "image1.cpp")
-target_link_libraries(image1 ${OpenCV_LIBS})
+#add_executable(image1 "image1.cpp")
+#target_link_libraries(image1 ${OpenCV_LIBS})
 
 #image2
 #add_executable(image2 "image2.cpp")
@@ -17,8 +17,8 @@ target_link_libraries(image1 ${OpenCV_LIBS})
 #target_link_libraries(image3 ${OpenCV_LIBS})
 
 #image4_1
-#add_executable(image4_1 "image4_1.cpp")
-#target_link_libraries(image4_1 ${OpenCV_LIBS})
+add_executable(image4_1 "image4_1.cpp")
+target_link_libraries(image4_1 ${OpenCV_LIBS})
 
 #image4_2
 #add_executable(image4_2 "image4_2.cpp")
