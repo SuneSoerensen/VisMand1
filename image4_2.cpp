@@ -6,7 +6,6 @@ int main()
     
     //Analysis("4_2", img4_2, false); //Not needed, for now
 
-
     //calc optimal size for DTF
     int height = getOptimalDFTSize((2 * img4_2.rows) - 1);
     int width = getOptimalDFTSize((2 * img4_2.cols) - 1);
