@@ -413,6 +413,11 @@ void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
     //crop to remove padding
     res = Mat(res, Rect(Point(0, 0), anImage.size()));
 
+    /*res += 1;
+    log(res, res);
+    normalize(res, res, 0, 1, NORM_MINMAX);
+    res.convertTo(res, CV_8U, 255);*/
+
     //save
     res.copyTo(anImage);
 }
