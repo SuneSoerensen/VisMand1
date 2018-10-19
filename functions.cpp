@@ -244,7 +244,7 @@ void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize)
 
             std::sort(arr.begin(), arr.end());
 
-            if (arr[arr.size()-1]> 0 || m == maxsize)
+            if (arr[arr.size()-1] > 0 || m == maxsize)
             {
               res.at<uchar>(i, j) = arr[arr.size()-1]; // take max value to remove pepper
               break;

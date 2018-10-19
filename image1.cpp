@@ -5,19 +5,17 @@ using namespace std;
 
 int main()
 {
-    Mat img1 = imread("Image1.png", IMREAD_GRAYSCALE);
+    Mat img1 = imread("../Images/Image1.png", IMREAD_GRAYSCALE);
 
     //Analysis("1", img1, false);
 
     Mat filtered;
-    Mat filtered2;
+    //Mat filtered2;
     adaptiveMaxFilter(img1, filtered, 9);
-    namedWindow("adaptiveMax", WINDOW_NORMAL);
-    resizeWindow("adaptiveMax", WIDTH, HEIGHT);
-    imshow("adaptiveMax",filtered);
-    Analysis("1",filtered,false);
-
-
+//    namedWindow("adaptiveMax", WINDOW_NORMAL);
+//    resizeWindow("adaptiveMax", WIDTH, HEIGHT);
+//    imshow("adaptiveMax",filtered);
+    Analysis("1", filtered, true);
 
     waitKey(0);
     return 0;

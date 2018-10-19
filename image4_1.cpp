@@ -45,7 +45,7 @@ int main()
     ButterworthHighpass(tempFilter, height - 2607, width - 1737, order, cutoffFreq);
     mulSpectrums(complexFilter, tempFilter, complexFilter, 0);
     
-//    ButterworthLowpass(tempFilter, height / 2, width / 2, 4, 1500);
+//    ButterworthLowpass(tempFilter, height / 2, width / 2, 4, 1500); //test to see if removing the small dots at high frequencies does anything signifigant
 //    mulSpectrums(complexFilter, tempFilter, complexFilter, 0);
     
     //Visualize filter (for debug purposses)
@@ -69,7 +69,7 @@ int main()
     filtered.convertTo(filtered, CV_8U, 255);
 
     //2nd analysis
-    Analysis("4_1A", filtered, false);
+    Analysis("4_1", filtered, true);
     
     waitKey(0);
     return 0;
