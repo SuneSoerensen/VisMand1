@@ -20,15 +20,18 @@ void Analysis(string name, Mat& anImg, bool save);
 void CalcAndShowHist(string name, Mat &anImage, bool save);
 void dftshift(cv::Mat& mag); //taken from "03_freq_domain_template.cpp" from BlackBoard!!!
 void CalcAndShowFourierMag(string name, Mat &anImage, bool save);
+
 void MedianFilter(Mat &anImage, Mat &res, int size); //size must be an odd number
 void MaxFilter(Mat &anImage, Mat &res, int size);//size must be an odd number
 void adaptiveMaxFilter(Mat &anImage, Mat &res, int maxsize);
 void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize);
 void adaptiveMedianFilter(Mat &anImage, Mat &res, int maxsize);
 void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff);
-void ApplyFreqFilter(Mat &anImage, Mat &aFilter); //apply complex filter in the frequency domain
+//void ApplyFreqFilter(Mat &anImage, Mat &aFilter); //apply complex filter in the frequency domain
 void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
 void midtPointFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
+void ButterworthHighpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
+void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
 
 
 //=================
@@ -361,7 +364,7 @@ void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff)
     int cols = output.cols;
 
     /*DEBUG*/
-    cout << "Rows: " << rows << ", Cols: " << cols << endl;
+    //cout << "Rows: " << rows << ", Cols: " << cols << endl;
 
     //For every element:
     for(int u = 0; u < cols; u++)
@@ -381,46 +384,46 @@ void gaussianBandReject(Mat_<Vec2f>& output, int bandWidth, int cutoff)
     }
 }
 
-void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
-{
-    //calc optimal size
-    int height = getOptimalDFTSize((2 * anImage.rows) - 1);
-    int width = getOptimalDFTSize((2 * anImage.cols) - 1);
+//void ApplyFreqFilter(Mat &anImage, Mat &aFilter)
+//{
+//    //calc optimal size
+//    int height = getOptimalDFTSize((2 * anImage.rows) - 1);
+//    int width = getOptimalDFTSize((2 * anImage.cols) - 1);
 
-    //pad image to make it optimally sized
-    Mat imgWithPad;
-    copyMakeBorder(anImage, imgWithPad, 0, height - anImage.rows, 0, width - anImage.cols, BORDER_CONSTANT, 0);
+//    //pad image to make it optimally sized
+//    Mat imgWithPad;
+//    copyMakeBorder(anImage, imgWithPad, 0, height - anImage.rows, 0, width - anImage.cols, BORDER_CONSTANT, 0);
 
-    //merge
-    Mat img2Channel;
-    Mat temp[2] = {Mat_<float>(imgWithPad), (Mat_<float>(imgWithPad)) = 0};
-    merge(temp, 2, img2Channel);
+//    //merge
+//    Mat img2Channel;
+//    Mat temp[2] = {Mat_<float>(imgWithPad), (Mat_<float>(imgWithPad)) = 0};
+//    merge(temp, 2, img2Channel);
 
-    //dft
-    dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
+//    //dft
+//    dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
 
-    //shift the filter quadrants
-    dftshift(aFilter);
+//    //shift the filter quadrants
+//    dftshift(aFilter);
 
-    //multiply in frequency domain to apply filter
-    Mat resFreq = img2Channel.clone();
-    mulSpectrums(img2Channel, aFilter, resFreq, 0, false);
+//    //multiply in frequency domain to apply filter
+//    Mat resFreq = img2Channel.clone();
+//    mulSpectrums(img2Channel, aFilter, resFreq, 0, false);
 
-    //inverse Fourier transform
-    Mat res;
-    dft(resFreq, res, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+//    //inverse Fourier transform
+//    Mat res;
+//    dft(resFreq, res, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
 
-    //crop to remove padding
-    res = Mat(res, Rect(Point(0, 0), anImage.size()));
+//    //crop to remove padding
+//    res = Mat(res, Rect(Point(0, 0), anImage.size()));
 
-    /*res += 1;
-    log(res, res);
-    normalize(res, res, 0, 1, NORM_MINMAX);
-    res.convertTo(res, CV_8U, 255);*/
+//    /*res += 1;
+//    log(res, res);
+//    normalize(res, res, 0, 1, NORM_MINMAX);
+//    res.convertTo(res, CV_8U, 255);*/
 
-    //save
-    res.copyTo(anImage);
-}
+//    //save
+//    res.copyTo(anImage);
+//}
 
 void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight)
 {
@@ -521,5 +524,31 @@ void midtPointFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterH
             max = 0;
             min = 255;
         }
+    }
+}
+
+void ButterworthHighpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq)
+{
+    for (int i = 0; i < complexFilter.rows; i++)
+    {
+       for (int j = 0; j < complexFilter.cols; j++)
+       {
+           float dist = sqrt(pow(i - u, 2) + pow(j - v, 2));
+           complexFilter.at<Vec2f>(i, j)[0] = 1.0 / (1.0 + pow(cutoffFreq / dist, 2.0 * order)); //real part
+           complexFilter.at<Vec2f>(i, j)[1] = 0.0; //imaginary part
+       }
+    }
+}
+
+void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq)
+{
+    for (int i = 0; i < complexFilter.rows; i++)
+    {
+       for (int j = 0; j < complexFilter.cols; j++)
+       {
+           float dist = sqrt(pow(i - u, 2) + pow(j - v, 2));
+           complexFilter.at<Vec2f>(i, j)[0] = 1.0 / (1.0 + pow(dist / cutoffFreq, 2.0 * order)); //real part
+           complexFilter.at<Vec2f>(i, j)[1] = 0.0; //imaginary part
+       }
     }
 }
