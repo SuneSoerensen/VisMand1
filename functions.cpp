@@ -6,6 +6,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <complex>
+#include <cmath>
 
 #define WIDTH 381
 #define HEIGHT 579
@@ -32,6 +34,7 @@ void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filt
 void midtPointFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
 void ButterworthHighpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
 void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
+void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A);
 
 
 //=================
@@ -550,5 +553,34 @@ void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffF
            complexFilter.at<Vec2f>(i, j)[0] = 1.0 / (1.0 + pow(dist / cutoffFreq, 2.0 * order)); //real part
            complexFilter.at<Vec2f>(i, j)[1] = 0.0; //imaginary part
        }
+    }
+}
+
+void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A)
+{
+    complex<double> part1 = 0;
+    complex<double> part2 = 0;
+    complex<double> part3 = 0;
+    complex<double> total = 0;
+    const std::complex<double> i(0, 1);
+    double PI = acos(-1);
+    
+    int centerU = output.cols/2;
+    int centerV = output.rows/2;
+    
+    for(int u = 0; u < output.cols; u++)
+    {
+	for(int v = 0; v < output.rows; v++)
+	{
+	    //Real part
+    
+	    part1 = T/(PI*((centerU-u)*A+(centerV-v)*B));
+	    part2 = sin(PI*((centerU-u)*A+(centerV-v)*B));
+	    part3 = exp(i * PI*((centerU-u)*A+(centerV-v)*B));
+    
+	    total = part1 *part2 * part3;
+	    output.at<Vec2f>(v,u)[0]= 1/total.real();
+	    output.at<Vec2f>(v,u)[1]= 1/total.imag();
+	}
     }
 }

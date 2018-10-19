@@ -21,9 +21,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 #target_link_libraries(image4_1 ${OpenCV_LIBS})
 
 #image4_2
-add_executable(image4_2 "image4_2.cpp")
-target_link_libraries(image4_2 ${OpenCV_LIBS})
+#add_executable(image4_2 "image4_2.cpp")
+#target_link_libraries(image4_2 ${OpenCV_LIBS})
 
 #image5
-#add_executable(image5 "image5.cpp")
-#target_link_libraries(image5 ${OpenCV_LIBS})
+add_executable(image5 "image5.cpp")
+target_link_libraries(image5 ${OpenCV_LIBS})
