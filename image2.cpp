@@ -8,7 +8,15 @@ int main()
 
     Mat resA;
     FredsAdaptiveMedian(img2, resA, 9);
-    Analysis("2", resA, true);
+    
+    Mat resB;
+    FredsAdaptiveMedian(resA, resB, 9);
+    
+    Mat resC;
+    //FredsAdaptiveMedian(resB, resC, 7);
+    //equalizeHist(resB, resC);
+    
+    Analysis("2", resB, false);
     
     waitKey(0);
     return 0;

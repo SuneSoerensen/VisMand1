@@ -276,7 +276,7 @@ void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize)
                         if (i + k > 0 && i + k < anImage.rows && j + l > 0 && j + l < anImage.cols) //if not out of bounds
                             arr.push_back(anImage.at<uchar>(i + k, j + l));
                         else
-                            arr.push_back(0); //padding value
+                            arr.push_back(128); //padding value
                     }
                 }
 
@@ -306,7 +306,7 @@ void FredsAdaptiveMedian(Mat &anImage, Mat &res, int maxSize)
 		}
 		else
 		{
-		    size++; //increase the window size
+		    size += 2; //increase the window size
 		}
 
 		if (size <= maxSize)
