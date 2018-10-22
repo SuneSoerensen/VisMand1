@@ -10,6 +10,24 @@ int main()
     Mat filtered(img3.size(), CV_8U);
     //harmonicMeanFilter(img3, filtered, 3, 3); //Not the best
     midtPointFilter(img3, filtered, 3, 3);
+    medianBlur(filtered, filtered, 3);
+    
+    //intensity transform
+    filtered -= 25;
+    //equalizeHist(filtered, filtered);
+    
+    //medianBlur(filtered, filtered, 3);
+    
+    //sharpening
+    Mat sharpened(filtered.size(), CV_8U);
+    UnsharpMasking(filtered, sharpened, 3);
+    
+    //equalizeHist(filtered, filtered);
+    
+    //medianBlur(sharpened, sharpened, 3);
+    
+    //Mat sharpened2(filtered.size(), CV_8U);
+    //UnsharpMasking(sharpened, sharpened2, 2);
 
 //    //Show result of first filtering:
 //    namedWindow("Filtered once", WINDOW_NORMAL);
@@ -29,7 +47,7 @@ int main()
 //    Mat roi = filtered(rect);
 //    CalcAndShowHist("ROI-filtered", roi, false);
     
-    Analysis("3", filtered, true);
+    Analysis("3", sharpened, true);
 
     waitKey(0);
     return 0;

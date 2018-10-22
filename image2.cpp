@@ -12,11 +12,24 @@ int main()
     Mat resB;
     FredsAdaptiveMedian(resA, resB, 9);
     
-    Mat resC;
-    //FredsAdaptiveMedian(resB, resC, 7);
-    //equalizeHist(resB, resC);
+    //equalizeHist(resB, resB);
+    medianBlur(resB, resB, 3);
     
-    Analysis("2", resB, false);
+    Mat resC(img2.size(), CV_8U);
+    //midtPointFilter(resB, resC, 3, 3);
+    //equalizeHist(resB, resC);
+    //UnsharpMasking(resB, resC, 2);
+    //medianBlur(resA, resC, 3);
+    
+    Mat resD(img2.size(), CV_8U);
+    //midtPointFilter(resC, resD, 3, 3);
+    //UnsharpMasking(resC, resD, 4);
+    
+    Mat resF(img2.size(), CV_8U);
+    //midtPointFilter(resD, resF, 5, 5);
+    //UnsharpMasking(resB, resF, 2);
+    
+    Analysis("2", resB, true);
     
     waitKey(0);
     return 0;

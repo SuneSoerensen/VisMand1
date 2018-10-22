@@ -35,6 +35,7 @@ void midtPointFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterH
 void ButterworthHighpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
 void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
 void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A);
+void UnsharpMasking(Mat &src, Mat &dst, int k);
 
 
 //=================
@@ -581,6 +582,27 @@ void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A)
 	    total = part1 *part2 * part3;
 	    output.at<Vec2f>(v,u)[0]= 1/total.real();
 	    output.at<Vec2f>(v,u)[1]= 1/total.imag();
+	}
+    }
+}
+
+void UnsharpMasking(Mat &src, Mat &dst, int k)
+{
+    //init dst
+    dst = src.clone();
+    
+    //blur
+    Mat blurred;
+    GaussianBlur(src, blurred, Size(3, 3), 0, 0);
+    //blur(src, blurred, Size(3, 3));
+    //medianBlur(src, blurred, 3);
+    
+    //calculate mask and apply
+    for (int i = 0; i < src.rows; i++)
+    {
+	for (int j = 0; j < src.cols; j++)
+	{
+	    dst.at<uchar>(i, j) += k * (src.at<uchar>(i, j) - blurred.at<uchar>(i, j));
 	}
     }
 }
