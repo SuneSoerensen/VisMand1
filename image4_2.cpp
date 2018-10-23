@@ -85,18 +85,50 @@ int main()
     dftshift(img2Channel);
 
     //Construct gaussian bandreject filter:
-    Mat_<Vec2f> gaussBandReject(img2Channel.size());
-    gaussianBandReject(gaussBandReject, 300, 820);
+    //Mat_<Vec2f> gaussBandReject(img2Channel.size());
+    //gaussianBandReject(gaussBandReject, 300, 820);
+    //Mat filter = gaussBandReject;
+    
+    //construct Notch filter
+    int order = 1;
+    int cutoffFreq = 50;
+    
+    Mat_<Vec2f> filter(img2Channel.size());
+    Mat_<Vec2f> tempFilter(img2Channel.size());
+
+    //from the top, clockwise...
+    ButterworthHighpass(filter, 1571, 1536, order, cutoffFreq); //...first pair
+    
+    ButterworthHighpass(tempFilter, height - 1571, width - 1536, order, cutoffFreq);
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, 1815, 2104, order, cutoffFreq); //...second pair
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, height - 1815, width - 2104, order, cutoffFreq);
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, 2401, 2342, order, cutoffFreq); //...third pair
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, height - 2401, width - 2342, order, cutoffFreq);
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, 2986, 2104, order, cutoffFreq); //...fourth pair
+    mulSpectrums(filter, tempFilter, filter, 0);
+    
+    ButterworthHighpass(tempFilter, height - 2986, width - 2104, order, cutoffFreq);
+    mulSpectrums(filter, tempFilter, filter, 0);
     
     //Visualize filter (for debug purposses)
     Mat filter2channel[2];
-    split(gaussBandReject, filter2channel);
+    split(filter, filter2channel);
     namedWindow("Filter", WINDOW_NORMAL);
     resizeWindow("Filter", Size(WIDTH, HEIGHT));
     imshow("Filter", filter2channel[0]);
     
     //multiply in frequency domain to apply filter
-    mulSpectrums(img2Channel, gaussBandReject, img2Channel, 0);
+    mulSpectrums(img2Channel, filter, img2Channel, 0);
     dftshift(img2Channel);
 
     //crop to remove padding
