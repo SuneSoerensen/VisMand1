@@ -12,14 +12,17 @@ int main()
     Mat resB;
     FredsAdaptiveMedian(resA, resB, 9);
     
+    Mat resC;
+    //FredsAdaptiveMedian(resB, resC, 9);
+    
     //equalizeHist(resB, resB);
-    medianBlur(resB, resB, 9);
-    medianBlur(resB, resB, 9);
+    //medianBlur(resB, resB, 9);
+    //medianBlur(resB, resB, 9);
     //GaussianBlur(resB, resB, Size(9, 9), 0, 0);
     
     //Mat resC = resB;
-//    Mat resC(img2.size(), CV_8U);
-//    midtPointFilter(resB, resC, 3, 3);
+    //Mat resC(img2.size(), CV_8U);
+    //midtPointFilter(resB, resC, 9, 9);
     
 //    Mat resD(img2.size(), CV_8U);
 //    midtPointFilter(resC, resD, 3, 3);
@@ -78,18 +81,18 @@ int main()
     //UnsharpMasking(resB, resC, 2);
     //medianBlur(resA, resC, 3);
     
-    Mat resC;
+    //Mat resC;
     //midtPointFilter(resC, resD, 3, 3);
-    UnsharpMasking(resB, resC, 8);
+    //UnsharpMasking(resB, resC, 8);
     
     Mat resD;
-    UnsharpMasking(resC, resD, 8);
+    //UnsharpMasking(resC, resD, 2);
     
     //Mat resF(img2.size(), CV_8U);
     //midtPointFilter(resD, resF, 5, 5);
     //UnsharpMasking(resB, resF, 2);
     
-    Analysis("2", resD, true);
+    Analysis("2", resB, true);
     
     waitKey(0);
     return 0;

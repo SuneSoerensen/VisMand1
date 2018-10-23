@@ -568,31 +568,32 @@ void motionBlurFilter(Mat_<Vec2f>& output, double T, double A, double B)
 
     double uavb = 0;
     
-    int centerU = output.cols/2;
-    int centerV = output.rows/2;
+    int centerU = /*output.cols/2*/0;
+    int centerV = /*output.rows/2*/0;
     
     for(int u = 0; u < output.cols; u++)
     {
 	for(int v = 0; v < output.rows; v++)
 	{
 	    //Real part
-            uavb = abs((u-centerU)*A+(v-centerV)*B);
-            part1 = T/(PI*(uavb));//T/(PI*((centerU-u)*A+(centerV-v)*B));
-            part2 = sin(PI*(uavb));
-            part3 = exp(-i * PI *(uavb));
+            uavb = (u-centerU)*A+(v-centerV)*B;
+            part1 = T/(PI*uavb);//T/(PI*((centerU-u)*A+(centerV-v)*B));
+            part2 = sin(PI*uavb);
+            part3 = exp(-i * PI *uavb);
     
             total = part1 * part2 * part3;
             ///*DEBUG*/ total = 1.0;
 
-            if(abs(total.real()) < 0.01)
-            {
-                output.at<Vec2f>(v,u)[0] = 0.01;
-            }
-            else
-            {
-                output.at<Vec2f>(v,u)[0]= (float)total.real();//1.0/total.real();
-            }
+//            if(abs(total.real()) < 0.01)
+//            {
+//                output.at<Vec2f>(v,u)[0] = 0.01;
+//            }
+//            else
+//            {
+//                output.at<Vec2f>(v,u)[0]= 1.0/total.real();
+//            }
 
+	    output.at<Vec2f>(v,u)[0]= (float)1.0/(float)total.real();
             output.at<Vec2f>(v,u)[1]= 0.0;//1.0/total.imag();
 
             //if(1/total.real() > 100000.0)

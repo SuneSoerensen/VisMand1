@@ -2,7 +2,8 @@
 
 int main()
 {
-    Mat img5 = imread("../Images/Image3_restored.png", IMREAD_GRAYSCALE); //imread("../Images/Image5_optional.png", IMREAD_GRAYSCALE);
+    //Mat img5 = imread("../Images/Image3.png", IMREAD_GRAYSCALE);
+    Mat img5 = imread("../Images/Image5_optional.png", IMREAD_GRAYSCALE);
 
     //Analysis("5", img5, false);
 
@@ -27,11 +28,22 @@ int main()
     Mat_<Vec2f> MotionBlurFilter(img2Channel.size());
     motionBlurFilter(MotionBlurFilter, 1.0, 2.0, 22.0);
     //gaussianBandReject(MotionBlurFilter, 200, 800);
-
-    mulSpectrums(img2Channel, MotionBlurFilter, img2Channel, 0);
-    dftshift(img2Channel);
+    
+    Mat_<Vec2f> lowpass(img2Channel.size());
+    ButterworthLowpass(lowpass, img2Channel.rows/2, img2Channel.cols/2, 10, 1100);
 
     //Multiply filter with image2channel:
+    mulSpectrums(MotionBlurFilter, lowpass, MotionBlurFilter, 0, false);
+    mulSpectrums(img2Channel, MotionBlurFilter, img2Channel, 0, false);
+//    for (int i = 0; i < img2Channel.rows; i++)
+//    {
+//        for (int j = 0; j < img2Channel.cols; j++)
+//        {
+//            //img2Channel.at<Vec2f>(i, j)[0] = (img2Channel.at<Vec2f>(i, j)[0] / MotionBlurFilter.at<Vec2f>(i, j)[0]) * lowpass.at<Vec2f>(i, j)[0];
+//        }
+//    }
+    dftshift(img2Channel);
+
     Mat filtered;
     idft(img2Channel, filtered, (DFT_SCALE | DFT_REAL_OUTPUT));
     filtered = Mat(filtered, Rect(Point((width - img5.cols) / 2, (height - img5.rows) / 2), img5.size()));

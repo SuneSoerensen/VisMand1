@@ -15,6 +15,12 @@ int main()
 //    namedWindow("adaptiveMax", WINDOW_NORMAL);
 //    resizeWindow("adaptiveMax", WIDTH, HEIGHT);
 //    imshow("adaptiveMax",filtered);
+    filtered += 50;
+    //medianBlur(filtered, filtered, 9);
+    
+    //Mat sharpened;
+    //UnsharpMasking(filtered, sharpened, 10);
+    
     Analysis("1", filtered, true);
 
     waitKey(0);

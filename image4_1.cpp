@@ -69,7 +69,7 @@ int main()
     filtered.convertTo(filtered, CV_8U, 255);
 
     //2nd analysis
-    Analysis("4_1", filtered, false);
+    Analysis("4_1", filtered, true);
     
     waitKey(0);
     return 0;
