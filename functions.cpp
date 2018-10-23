@@ -34,7 +34,7 @@ void harmonicMeanFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filt
 void midtPointFilter(Mat& inputImg, Mat& outputImg, int filterWidth, int filterHeight);
 void ButterworthHighpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
 void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffFreq);
-void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A);
+void motionBlurFilter(Mat_<Vec2f>& output, double T, double A, double B);
 void UnsharpMasking(Mat &src, Mat &dst, int k);
 
 
@@ -557,7 +557,7 @@ void ButterworthLowpass(Mat &complexFilter, int u, int v, int order, int cutoffF
     }
 }
 
-void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A)
+void motionBlurFilter(Mat_<Vec2f>& output, double T, double A, double B)
 {
     complex<double> part1 = 0;
     complex<double> part2 = 0;
@@ -565,6 +565,8 @@ void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A)
     complex<double> total = 0;
     const std::complex<double> i(0, 1);
     double PI = acos(-1);
+
+    double uavb = 0;
     
     int centerU = output.cols/2;
     int centerV = output.rows/2;
@@ -574,14 +576,38 @@ void motionBlurFilter(Mat_<Vec2f>& output, double T, double B, double A)
 	for(int v = 0; v < output.rows; v++)
 	{
 	    //Real part
+            uavb = abs((u-centerU)*A+(v-centerV)*B);
+            part1 = T/(PI*(uavb));//T/(PI*((centerU-u)*A+(centerV-v)*B));
+            part2 = sin(PI*(uavb));
+            part3 = exp(-i * PI *(uavb));
     
-	    part1 = T/(PI*((centerU-u)*A+(centerV-v)*B));
-	    part2 = sin(PI*((centerU-u)*A+(centerV-v)*B));
-	    part3 = exp(i * PI*((centerU-u)*A+(centerV-v)*B));
-    
-	    total = part1 *part2 * part3;
-	    output.at<Vec2f>(v,u)[0]= 1/total.real();
-	    output.at<Vec2f>(v,u)[1]= 1/total.imag();
+            total = part1 * part2 * part3;
+            ///*DEBUG*/ total = 1.0;
+
+            if(abs(total.real()) < 0.01)
+            {
+                output.at<Vec2f>(v,u)[0] = 0.01;
+            }
+            else
+            {
+                output.at<Vec2f>(v,u)[0]= (float)total.real();//1.0/total.real();
+            }
+
+            output.at<Vec2f>(v,u)[1]= 0.0;//1.0/total.imag();
+
+            //if(1/total.real() > 100000.0)
+            //{
+              //  output.at<Vec2f>(v,u)[0] = 255.0;
+                /*cout << "Extreme value " << 1/total.real() << " found at " << v << "," << u << endl;
+                cout << "part1 = " << part1 << endl;
+                cout << "part2 = " << part2 << endl;
+                cout << "part3 = " << part3 << endl;*/
+            //}
+            /*else if(1/total.real() < -100000.0)
+            {
+                output.at<Vec2f>(v,u)[0] = -255.0;
+                //cout << "Extreme value " << 1/total.real() << " found at " << v << "," << u << endl;
+            }*/
 	}
     }
 }

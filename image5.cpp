@@ -2,7 +2,7 @@
 
 int main()
 {
-    Mat img5 = imread("../Images/Image5_optional.png", IMREAD_GRAYSCALE);
+    Mat img5 = imread("../Images/Image3_restored.png", IMREAD_GRAYSCALE); //imread("../Images/Image5_optional.png", IMREAD_GRAYSCALE);
 
     //Analysis("5", img5, false);
 
@@ -23,9 +23,10 @@ int main()
     dft(img2Channel, img2Channel, DFT_COMPLEX_OUTPUT);
     dftshift(img2Channel);
 
-    //build invers filter
+    //build inverse filter
     Mat_<Vec2f> MotionBlurFilter(img2Channel.size());
-    motionBlurFilter(MotionBlurFilter,1,0.0001,0.001);
+    motionBlurFilter(MotionBlurFilter, 1.0, 2.0, 22.0);
+    //gaussianBandReject(MotionBlurFilter, 200, 800);
 
     mulSpectrums(img2Channel, MotionBlurFilter, img2Channel, 0);
     dftshift(img2Channel);
@@ -34,6 +35,17 @@ int main()
     Mat filtered;
     idft(img2Channel, filtered, (DFT_SCALE | DFT_REAL_OUTPUT));
     filtered = Mat(filtered, Rect(Point((width - img5.cols) / 2, (height - img5.rows) / 2), img5.size()));
+
+    /*for(int i = 0; i < filtered.rows; i++)
+    {
+        for(int j = 0; j < filtered.cols; j++)
+        {
+           if(MotionBlurFilter.at<Vec2f>(i,j)[0] != 1.0)
+               cout << "ERROR at: " << i << "," << j << endl;
+        }
+    }*/
+
+    ///*DEBUG*/cout << "filtered.type() = " << filtered.type() << endl;
 
     //Visualize filter:
     Mat filter2channel[2];
