@@ -48,15 +48,15 @@ void Analysis(string name, Mat& anImg, bool save)
     resizeWindow("Image" + name, WIDTH, HEIGHT);
     imshow("Image" + name, anImg);
     if (save)
-	imwrite("Image" + name + ".png", anImg);
+	imwrite("Image_" + name + ".png", anImg);
 
-    CalcAndShowHist("Original" + name, anImg, save);
+    CalcAndShowHist("Full_image_hist_" + name, anImg, save);
 
     Rect rect(825, 1424, 675, 384); //(corner_x, corner_y, length_x, length_y)
     Mat roi = anImg(rect);
-    CalcAndShowHist("ROI" + name, roi, save);
+    CalcAndShowHist("ROI_hist_" + name, roi, save);
 
-    CalcAndShowFourierMag("Magnitude" + name, anImg, save);
+    CalcAndShowFourierMag("Magnitude_spec_" + name, anImg, save);
 }
 
 void CalcAndShowHist(string name, Mat &anImage, bool save)

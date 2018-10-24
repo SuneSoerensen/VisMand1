@@ -5,7 +5,7 @@ int main()
     Mat img4_2 = imread("../Images/Image4_2.png", IMREAD_GRAYSCALE);
     
     //initial analysis
-    //Analysis("4_2", img4_2, false);
+    Analysis("4_2(0)", img4_2, true);
 
 //    //calc optimal size for DTF
 //    int height = getOptimalDFTSize((2 * img4_2.rows) - 1);
@@ -141,7 +141,7 @@ int main()
     filtered.convertTo(filtered, CV_8U, 255);
 
     //2nd analysis
-    Analysis("4_2", filtered, true);
+    Analysis("4_2(1)", filtered, true);
     
     waitKey(0);
     return 0;

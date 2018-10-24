@@ -4,13 +4,16 @@ int main()
 {
     Mat img3 = imread("../Images/Image3.png", IMREAD_GRAYSCALE);
     
-    //Analysis("3", img3, false);
+    Analysis("3(0)", img3, true);
 
     //Apply filter:
     Mat filtered(img3.size(), CV_8U);
     //harmonicMeanFilter(img3, filtered, 3, 3); //Not the best
     midtPointFilter(img3, filtered, 3, 3);
+    Analysis("3(1)", filtered, true);
+    
     medianBlur(filtered, filtered, 3);
+    Analysis("3(2)", filtered, true);
     
     //intensity transform
     filtered -= 25;
@@ -47,7 +50,7 @@ int main()
 //    Mat roi = filtered(rect);
 //    CalcAndShowHist("ROI-filtered", roi, false);
     
-    Analysis("3", sharpened, true);
+    Analysis("3(3)", sharpened, true);
 
     waitKey(0);
     return 0;

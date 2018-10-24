@@ -5,7 +5,7 @@ int main()
     //Mat img5 = imread("../Images/Image3.png", IMREAD_GRAYSCALE);
     Mat img5 = imread("../Images/Image5_optional.png", IMREAD_GRAYSCALE);
 
-    //Analysis("5", img5, false);
+    Analysis("5(0)", img5, true);
 
     //calc optimal size for DTF
     int height = getOptimalDFTSize((2 * img5.rows) - 1);

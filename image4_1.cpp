@@ -5,7 +5,7 @@ int main()
     Mat img4_1 = imread("../Images/Image4_1.png", IMREAD_GRAYSCALE);
 
     //initial analysis
-    //Analysis("4_1", img4_1, false);
+    Analysis("4_1(0)", img4_1, true);
 
     //-----------
     // Filtering
@@ -69,7 +69,7 @@ int main()
     filtered.convertTo(filtered, CV_8U, 255);
 
     //2nd analysis
-    Analysis("4_1", filtered, true);
+    Analysis("4_1(1)", filtered, true);
     
     waitKey(0);
     return 0;

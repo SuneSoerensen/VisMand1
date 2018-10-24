@@ -4,7 +4,7 @@ int main()
 {
     Mat img2 = imread("../Images/Image2.png", IMREAD_GRAYSCALE);
     
-    //Analysis("2", img2, false);
+    Analysis("2(0)", img2, true);
 
     Mat resA;
     FredsAdaptiveMedian(img2, resA, 9);
@@ -92,7 +92,7 @@ int main()
     //midtPointFilter(resD, resF, 5, 5);
     //UnsharpMasking(resB, resF, 2);
     
-    Analysis("2", resB, true);
+    Analysis("2(1)", resB, true);
     
     waitKey(0);
     return 0;

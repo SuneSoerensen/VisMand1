@@ -7,7 +7,7 @@ int main()
 {
     Mat img1 = imread("../Images/Image1.png", IMREAD_GRAYSCALE);
 
-    //Analysis("1", img1, false);
+    Analysis("1(0)", img1, true);
 
     Mat filtered;
     //Mat filtered2;
@@ -15,13 +15,14 @@ int main()
 //    namedWindow("adaptiveMax", WINDOW_NORMAL);
 //    resizeWindow("adaptiveMax", WIDTH, HEIGHT);
 //    imshow("adaptiveMax",filtered);
+    Analysis("1(1)", filtered, true);
     filtered += 50;
     //medianBlur(filtered, filtered, 9);
     
     //Mat sharpened;
     //UnsharpMasking(filtered, sharpened, 10);
     
-    Analysis("1", filtered, true);
+    Analysis("1(2)", filtered, true);
 
     waitKey(0);
     return 0;
